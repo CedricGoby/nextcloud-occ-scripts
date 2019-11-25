@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-# Description : Importation d'utilisateurs dans Nextcloud avec la commande occ,
-# envoi d'un email à l'utilisateur avec ses identifiants. 
+# Description : Importation d'utilisateurs dans Nextcloud depuis un fichier CSV avec la commande occ, 
+# envoi par email des identifiants à l'utilisateur. 
 # Usage : ./occ-ajout-utilisateur-csv-import.sh
 # Licence : MIT
 # Auteur : Cédric Goby
