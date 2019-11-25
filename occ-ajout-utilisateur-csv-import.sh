@@ -50,7 +50,7 @@ Subject: $_name - Vos identifiants Nextcloud
 
 Bonjour $_name,
 
-Veuillez trouver vos identifiants Nextcloud
+Veuillez trouver ci-dessous vos identifiants Nextcloud
 
 $_url_nextcloud
 Utilisateur : $_user
