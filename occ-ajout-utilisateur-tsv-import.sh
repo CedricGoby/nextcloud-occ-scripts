@@ -25,7 +25,7 @@ _docker_occ="/var/www/html/occ"
 # Définition du quota
 export _quota="100MB"
 # Définition du groupe
-export _group="oasis"
+export _group="mygroup"
 
 # On parcourt le fichier TSV des utilisateurs à importer dans Nextcloud
 # -u bash 4.1 ou plus récent peut allouer un descripteur de fichier libre
