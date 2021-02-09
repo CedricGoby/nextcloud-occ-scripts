@@ -56,7 +56,7 @@ $_url_nextcloud
 Utilisateur : $_user
 Mot de passe : $OC_PASS
 
-... et les bonnes pratiques et logiciels pour gérer vos mots de passe efficacement :
+...et les bonnes pratiques et logiciels pour gérer vos mots de passe :
 https://www.cybermalveillance.gouv.fr/tous-nos-contenus/bonnes-pratiques/mots-de-passe
 
 Ceci est un email automatique, merci de ne pas répondre à ce message.
