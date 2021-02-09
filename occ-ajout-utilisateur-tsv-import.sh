@@ -19,7 +19,7 @@ _from="nextcloud-servers@domain.tld"
 _url_nextcloud="https://collaborative.domain.tld/"
 
 # Définition du quota
-export _quota="500MB"
+export _quota="100MB"
 # Définition du groupe
 export _group="mongroupe"
 
@@ -61,6 +61,8 @@ Ceci est un email automatique, merci de ne pas répondre à ce message.
 Bonne journée
 
 END
+
+sleep 3
 
 # Création (si besoin) d'un fichier TSV des utilisateurs importés dans Nextcloud.
 # Attention, le mot de passe est enregistré en clair.
