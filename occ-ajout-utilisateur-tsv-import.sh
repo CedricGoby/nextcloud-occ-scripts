@@ -14,43 +14,60 @@ _src_users_to_add="occ-ajout-utilisateur-csv-import.tsv"
 # Le fichier TSV ne doit comporter ni en-têtes ni lignes vides.
 _src_added_users="occ-ajout-utilisateur-csv-import.log"
 # Expéditeur du mail contenant les identifiants utilisateur
-_from="nextcloud-servers@domain.tld"
+_from="agap-server@inrae.fr"
 # URL Nextcloud
-_url_nextcloud="https://collaborative.domain.tld/"
+_url_nextcloud="https://cloud.oasis-grape.org/"
+# Service name Nextcloud (Docker compose)
+_docker_nextcloud="app"
+# Chemin OCC (Docker compose)
+_docker_occ="/var/www/html/occ"
 
 # Définition du quota
 export _quota="100MB"
 # Définition du groupe
-export _group="mongroupe"
+export _group="oasis"
 
 # On parcourt le fichier TSV des utilisateurs à importer dans Nextcloud
-while IFS=$'\t' read _user _name _email; do
+# -u bash 4.1 ou plus récent peut allouer un descripteur de fichier libre
+# Sinon la commande docker-compose exec peut consumer stdin (la liste des lignes restantes).
+while IFS=$'\t' read -u "$fd_num" _user _name _email; do
 
 # Génération d'un mot de passe utlisateur
-export OC_PASS="$(gpg --armor --gen-random 1 16)"
+export OC_PASS="$(gpg --armor --gen-random 1 8)"
 # Export des variables utilisateur
 export _user="$_user"
 export _name="$_name"
 export _email="$_email"
 
-# Ajout de l'utilisateur dans Nextcloud
-su -s /bin/sh www-data -c 'php /var/www/nextcloud/occ user:add --password-from-env --display-name="$_name" --group="$_group" $_user'
+if [ -z "$_docker_nextcloud" ]; then
+	# Ajout de l'utilisateur dans Nextcloud
+	su -s /bin/sh www-data -c 'php /var/www/nextcloud/occ user:add --password-from-env --display-name="$_name" --group="$_group" $_user'
 
-# Paramétrage du compte utilisateur dans Nextcloud
-su -s /bin/sh www-data -c 'php /var/www/nextcloud/occ user:setting "$_user" settings email "$_email"'
-su -s /bin/sh www-data -c 'php /var/www/nextcloud/occ user:setting "$_user" core lang fr'
-su -s /bin/sh www-data -c 'php /var/www/nextcloud/occ user:setting "$_user" files quota "$_quota"'
+	# Paramétrage du compte utilisateur dans Nextcloud
+	su -s /bin/sh www-data -c 'php /var/www/nextcloud/occ user:setting "$_user" settings email "$_email"'
+	su -s /bin/sh www-data -c 'php /var/www/nextcloud/occ user:setting "$_user" core lang fr'
+	su -s /bin/sh www-data -c 'php /var/www/nextcloud/occ user:setting "$_user" files quota "$_quota"'
+else
+	# Ajout de l'utilisateur dans Nextcloud (Docker compose)
+	# Le script doit alors être exécuté depuis le répertoire contenant le fichier docker compose.
+	docker-compose exec -T -e OC_PASS="$OC_PASS" --user www-data "$_docker_nextcloud" php "$_docker_occ" user:add --password-from-env --display-name="$_name" --group="$_group" $_user
+
+	# Paramétrage du compte utilisateur dans Nextcloud (Docker compose)
+	docker-compose exec -T --user www-data "$_docker_nextcloud" php "$_docker_occ" user:setting "$_user" settings email "$_email"
+	docker-compose exec -T --user www-data "$_docker_nextcloud" php "$_docker_occ" user:setting "$_user" core lang fr
+	docker-compose exec -T --user www-data "$_docker_nextcloud" php "$_docker_occ" user:setting "$_user" files quota "$_quota"
+fi
 
 # Envoi des identifiants à l'utilisateur par email avec msmtp
 msmtp -d -a default -t <<END
 From: $_from
 To: $_email
 Content-Type: text/plain; charset=UTF-8
-Subject: $_name - Vos identifiants Nextcloud
+Subject: $_name - Vos identifiants Nextcloud OASIs
 
 Bonjour $_name,
 
-Veuillez trouver ci-dessous vos identifiants Nextcloud...
+Veuillez trouver ci-dessous vos identifiants Nextcloud pour le projet OASIs...
 
 $_url_nextcloud
 Utilisateur : $_user
@@ -65,8 +82,6 @@ Bonne journée
 
 END
 
-sleep 3
-
 # Création (si besoin) d'un fichier TSV des utilisateurs importés dans Nextcloud.
 # Attention, le mot de passe est enregistré en clair.
 # printf "%s\t%s\t%s\t%s\t%s\t%s\n" "$_user" "$_name" "$OC_PASS" "$_group" "$_email" "$_quota" >> "$_src_added_users"
@@ -77,4 +92,5 @@ unset _user
 unset _name
 unset _email
 
-done <"$_src_users_to_add"
+# bash 4.1 ou plus récent peut allouer un descripteur de fichier libre {fd_num}
+done {fd_num}<"$_src_users_to_add"
