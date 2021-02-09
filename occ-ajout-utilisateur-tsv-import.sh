@@ -14,9 +14,9 @@ _src_users_to_add="occ-ajout-utilisateur-csv-import.tsv"
 # Le fichier TSV ne doit comporter ni en-têtes ni lignes vides.
 _src_added_users="occ-ajout-utilisateur-csv-import.log"
 # Expéditeur du mail contenant les identifiants utilisateur
-_from="agap-server@inrae.fr"
+_from="me@domain.tld"
 # URL Nextcloud
-_url_nextcloud="https://cloud.oasis-grape.org/"
+_url_nextcloud="https://sub.domain.org/"
 # Service name Nextcloud (Docker compose)
 _docker_nextcloud="app"
 # Chemin OCC (Docker compose)
@@ -63,11 +63,11 @@ msmtp -d -a default -t <<END
 From: $_from
 To: $_email
 Content-Type: text/plain; charset=UTF-8
-Subject: $_name - Vos identifiants Nextcloud OASIs
+Subject: $_name - Vos identifiants Nextcloud
 
 Bonjour $_name,
 
-Veuillez trouver ci-dessous vos identifiants Nextcloud pour le projet OASIs...
+Veuillez trouver ci-dessous vos identifiants Nextcloud...
 
 $_url_nextcloud
 Utilisateur : $_user
