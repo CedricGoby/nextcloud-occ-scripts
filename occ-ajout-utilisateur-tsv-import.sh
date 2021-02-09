@@ -50,11 +50,14 @@ Subject: $_name - Vos identifiants Nextcloud
 
 Bonjour $_name,
 
-Veuillez trouver ci-dessous vos identifiants Nextcloud
+Veuillez trouver ci-dessous vos identifiants Nextcloud...
 
 $_url_nextcloud
 Utilisateur : $_user
 Mot de passe : $OC_PASS
+
+... et les bonnes pratiques et logiciels pour gérer vos mots de passe efficacement :
+https://www.cybermalveillance.gouv.fr/tous-nos-contenus/bonnes-pratiques/mots-de-passe
 
 Ceci est un email automatique, merci de ne pas répondre à ce message.
 
