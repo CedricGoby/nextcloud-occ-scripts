@@ -9,23 +9,25 @@
 
 # Fichier TSV d'entrée (utilisateurs à importer) séparé par des tabulations contenant les champs suivants : nom d'utilisateur, nom à afficher, adresse email.
 # Le fichier TSV ne doit comporter ni en-têtes ni lignes vides.
-_src_users_to_add="occ-ajout-utilisateur-csv-import.tsv"
+_src_users_to_add="occ-ajout-utilisateur-tsv-import.tsv"
 # Fichier TSV de sortie (utilisateurs importés) séparé par des tabulations contenant les champs suivants : nom d'utilisateur, nom à afficher, mot de passe, groupe, adresse email, quota.
 # Le fichier TSV ne doit comporter ni en-têtes ni lignes vides.
-_src_added_users="occ-ajout-utilisateur-csv-import.log"
+_src_added_users="occ-ajout-utilisateur-tsv-import.log"
 # Expéditeur du mail contenant les identifiants utilisateur
-_from="me@domain.tld"
+_from="agap-server@inrae.fr"
 # URL Nextcloud
-_url_nextcloud="https://sub.domain.org/"
+_url_nextcloud="https://collaborative.scoop-anr.org/"
 # Service name Nextcloud (Docker compose)
 _docker_nextcloud="app"
+# Fichier compose
+_docker_compose_file="docker/.examples/docker-compose/insecure/mariadb/apache/docker-compose.yml"
 # Chemin OCC (Docker compose)
 _docker_occ="/var/www/html/occ"
 
 # Définition du quota
 export _quota="100MB"
 # Définition du groupe
-export _group="mygroup"
+export _group="scoop"
 
 # On parcourt le fichier TSV des utilisateurs à importer dans Nextcloud
 # -u bash 4.1 ou plus récent peut allouer un descripteur de fichier libre
@@ -39,31 +41,37 @@ export _user="$_user"
 export _name="$_name"
 export _email="$_email"
 
-if [ -z "$_docker_nextcloud" ]; then
-	# Ajout de l'utilisateur dans Nextcloud
-	su -s /bin/sh www-data -c 'php /var/www/nextcloud/occ user:add --password-from-env --display-name="$_name" --group="$_group" $_user'
 
-	# Paramétrage du compte utilisateur dans Nextcloud
-	su -s /bin/sh www-data -c 'php /var/www/nextcloud/occ user:setting "$_user" settings email "$_email"'
-	su -s /bin/sh www-data -c 'php /var/www/nextcloud/occ user:setting "$_user" core lang fr'
-	su -s /bin/sh www-data -c 'php /var/www/nextcloud/occ user:setting "$_user" files quota "$_quota"'
-else
-	# Ajout de l'utilisateur dans Nextcloud (Docker compose)
-	# Le script doit alors être exécuté depuis le répertoire contenant le fichier docker compose.
-	docker-compose exec -T -e OC_PASS="$OC_PASS" --user www-data "$_docker_nextcloud" php "$_docker_occ" user:add --password-from-env --display-name="$_name" --group="$_group" $_user
+# Ajout de l'utilisateur dans Nextcloud (Docker)
+docker-compose -f "$_docker_compose_file" exec -T -e OC_PASS="$OC_PASS" --user www-data "$_docker_nextcloud" php "$_docker_occ" user:add --password-from-env --display-name="$_name" --group="$_group" $_user
+# Paramétrage du compte utilisateur dans Nextcloud
+docker-compose -f "$_docker_compose_file" exec -T --user www-data "$_docker_nextcloud" php "$_docker_occ" user:setting "$_user" settings email "$_email"
+docker-compose -f "$_docker_compose_file" exec -T --user www-data "$_docker_nextcloud" php "$_docker_occ" user:setting "$_user" core lang fr
+docker-compose -f "$_docker_compose_file" exec -T --user www-data "$_docker_nextcloud" php "$_docker_occ" user:setting "$_user" files quota "$_quota"
 
-	# Paramétrage du compte utilisateur dans Nextcloud (Docker compose)
-	docker-compose exec -T --user www-data "$_docker_nextcloud" php "$_docker_occ" user:setting "$_user" settings email "$_email"
-	docker-compose exec -T --user www-data "$_docker_nextcloud" php "$_docker_occ" user:setting "$_user" core lang fr
-	docker-compose exec -T --user www-data "$_docker_nextcloud" php "$_docker_occ" user:setting "$_user" files quota "$_quota"
-fi
+
+## Ajout de l'utilisateur dans Nextcloud (Bare metal)
+#su -s /bin/sh www-data -c 'php /var/www/nextcloud/occ user:add --password-from-env --display-name="$_name" --group="$_group" $_user'
+## Paramétrage du compte utilisateur dans Nextcloud
+#su -s /bin/sh www-data -c 'php /var/www/nextcloud/occ user:setting "$_user" settings email "$_email"'
+#su -s /bin/sh www-data -c 'php /var/www/nextcloud/occ user:setting "$_user" core lang fr'
+#su -s /bin/sh www-data -c 'php /var/www/nextcloud/occ user:setting "$_user" files quota "$_quota"'
+
+
+# Ajout de l'utilisateur dans Nextcloud (Docker compose)
+docker-compose -f "$_docker_compose_file" exec -T -e OC_PASS="$OC_PASS" --user www-data "$_docker_nextcloud" php "$_docker_occ" user:add --password-from-env --display-name="$_name" --group="$_group" $_user
+# Paramétrage du compte utilisateur dans Nextcloud
+docker-compose -f "$_docker_compose_file" exec -T --user www-data "$_docker_nextcloud" php "$_docker_occ" user:setting "$_user" settings email "$_email"
+docker-compose -f "$_docker_compose_file" exec -T --user www-data "$_docker_nextcloud" php "$_docker_occ" user:setting "$_user" core lang fr
+docker-compose -f "$_docker_compose_file" exec -T --user www-data "$_docker_nextcloud" php "$_docker_occ" user:setting "$_user" files quota "$_quota"
+#fi
 
 # Envoi des identifiants à l'utilisateur par email avec msmtp
 msmtp -d -a default -t <<END
 From: $_from
 To: $_email
 Content-Type: text/plain; charset=UTF-8
-Subject: $_name - Vos identifiants Nextcloud
+Subject: $_name - Vos identifiants Nextcloud SCOOP
 
 Bonjour $_name,
 
