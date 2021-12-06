@@ -18,9 +18,9 @@ _from=""
 # URL Nextcloud
 _url_nextcloud=""
 # Fichier compose
-_docker_compose_file="docker/.examples/docker-compose/insecure/mariadb/apache/docker-compose.yml"
+_docker_compose_file=""
 # Service name Nextcloud (Docker compose)
-_compose_service_name="app"
+_compose_service_name=""
 
 # Service name Nextcloud (Docker)
 _container_id="app"
@@ -31,7 +31,7 @@ _docker_occ="/var/www/html/occ"
 # Définition du quota
 export _quota="100MB"
 # Définition du groupe
-export _group="scoop"
+export _group=""
 
 # On parcourt le fichier TSV des utilisateurs à importer dans Nextcloud
 # -u bash 4.1 ou plus récent peut allouer un descripteur de fichier libre
