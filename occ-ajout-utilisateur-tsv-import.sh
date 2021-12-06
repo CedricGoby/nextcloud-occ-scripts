@@ -14,13 +14,17 @@ _src_users_to_add="occ-ajout-utilisateur-tsv-import.tsv"
 # Le fichier TSV ne doit comporter ni en-têtes ni lignes vides.
 _src_added_users="occ-ajout-utilisateur-tsv-import.log"
 # Expéditeur du mail contenant les identifiants utilisateur
-_from="agap-server@inrae.fr"
+_from=""
 # URL Nextcloud
-_url_nextcloud="https://collaborative.scoop-anr.org/"
-# Service name Nextcloud (Docker compose)
-_docker_nextcloud="app"
+_url_nextcloud=""
 # Fichier compose
 _docker_compose_file="docker/.examples/docker-compose/insecure/mariadb/apache/docker-compose.yml"
+# Service name Nextcloud (Docker compose)
+_compose_service_name="app"
+
+# Service name Nextcloud (Docker)
+_container_id="app"
+
 # Chemin OCC (Docker compose)
 _docker_occ="/var/www/html/occ"
 
@@ -43,11 +47,11 @@ export _email="$_email"
 
 
 # Ajout de l'utilisateur dans Nextcloud (Docker)
-docker-compose -f "$_docker_compose_file" exec -T -e OC_PASS="$OC_PASS" --user www-data "$_docker_nextcloud" php "$_docker_occ" user:add --password-from-env --display-name="$_name" --group="$_group" $_user
+docker exec -T -e OC_PASS="$OC_PASS" --user www-data "$_compose_service_name" php "$_docker_occ" user:add --password-from-env --display-name="$_name" --group="$_group" $_user
 # Paramétrage du compte utilisateur dans Nextcloud
-docker-compose -f "$_docker_compose_file" exec -T --user www-data "$_docker_nextcloud" php "$_docker_occ" user:setting "$_user" settings email "$_email"
-docker-compose -f "$_docker_compose_file" exec -T --user www-data "$_docker_nextcloud" php "$_docker_occ" user:setting "$_user" core lang fr
-docker-compose -f "$_docker_compose_file" exec -T --user www-data "$_docker_nextcloud" php "$_docker_occ" user:setting "$_user" files quota "$_quota"
+docker exec -T --user www-data "$_container_id" php "$_docker_occ" user:setting "$_user" settings email "$_email"
+docker exec -T --user www-data "$_container_id" php "$_docker_occ" user:setting "$_user" core lang fr
+docker exec -T --user www-data "$_container_id" php "$_docker_occ" user:setting "$_user" files quota "$_quota"
 
 
 ## Ajout de l'utilisateur dans Nextcloud (Bare metal)
@@ -59,11 +63,11 @@ docker-compose -f "$_docker_compose_file" exec -T --user www-data "$_docker_next
 
 
 # Ajout de l'utilisateur dans Nextcloud (Docker compose)
-docker-compose -f "$_docker_compose_file" exec -T -e OC_PASS="$OC_PASS" --user www-data "$_docker_nextcloud" php "$_docker_occ" user:add --password-from-env --display-name="$_name" --group="$_group" $_user
+docker exec -T -e OC_PASS="$OC_PASS" --user www-data "$_compose_service_name" php "$_docker_occ" user:add --password-from-env --display-name="$_name" --group="$_group" $_user
 # Paramétrage du compte utilisateur dans Nextcloud
-docker-compose -f "$_docker_compose_file" exec -T --user www-data "$_docker_nextcloud" php "$_docker_occ" user:setting "$_user" settings email "$_email"
-docker-compose -f "$_docker_compose_file" exec -T --user www-data "$_docker_nextcloud" php "$_docker_occ" user:setting "$_user" core lang fr
-docker-compose -f "$_docker_compose_file" exec -T --user www-data "$_docker_nextcloud" php "$_docker_occ" user:setting "$_user" files quota "$_quota"
+docker-compose -f "$_docker_compose_file" exec -T --user www-data "$_compose_service_name" php "$_docker_occ" user:setting "$_user" settings email "$_email"
+docker-compose -f "$_docker_compose_file" exec -T --user www-data "$_compose_service_name" php "$_docker_occ" user:setting "$_user" core lang fr
+docker-compose -f "$_docker_compose_file" exec -T --user www-data "$_compose_service_name" php "$_docker_occ" user:setting "$_user" files quota "$_quota"
 #fi
 
 # Envoi des identifiants à l'utilisateur par email avec msmtp
