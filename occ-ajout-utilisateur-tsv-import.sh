@@ -75,7 +75,7 @@ msmtp -d -a default -t <<END
 From: $_from
 To: $_email
 Content-Type: text/plain; charset=UTF-8
-Subject: $_name - Vos identifiants Nextcloud
+Subject: $_name - Vos identifiants Nextcloud $_url_nextcloud
 
 Bonjour $_name,
 
