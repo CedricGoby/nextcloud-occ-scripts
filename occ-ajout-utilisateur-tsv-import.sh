@@ -22,8 +22,8 @@ _docker_compose_file=""
 # Service name Nextcloud (Docker compose)
 _compose_service_name=""
 
-# Service name Nextcloud (Docker)
-_container_id="app"
+# Container ID Nextcloud (Docker)
+_container_id=""
 
 # Chemin OCC (Docker compose)
 _docker_occ="/var/www/html/occ"
