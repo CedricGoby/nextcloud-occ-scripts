@@ -47,11 +47,11 @@ export _email="$_email"
 
 
 # Ajout de l'utilisateur dans Nextcloud (Docker)
-docker exec -T -e OC_PASS="$OC_PASS" --user www-data "$_container_id" php "$_docker_occ" user:add --password-from-env --display-name="$_name" --group="$_group" $_user
+docker exec -it -e OC_PASS="$OC_PASS" --user www-data "$_container_id" php "$_docker_occ" user:add --password-from-env --display-name="$_name" --group="$_group" $_user
 # Paramétrage du compte utilisateur dans Nextcloud
-docker exec -T --user www-data "$_container_id" php "$_docker_occ" user:setting "$_user" settings email "$_email"
-docker exec -T --user www-data "$_container_id" php "$_docker_occ" user:setting "$_user" core lang fr
-docker exec -T --user www-data "$_container_id" php "$_docker_occ" user:setting "$_user" files quota "$_quota"
+docker exec -it --user www-data "$_container_id" php "$_docker_occ" user:setting "$_user" settings email "$_email"
+docker exec -it --user www-data "$_container_id" php "$_docker_occ" user:setting "$_user" core lang fr
+docker exec -it --user www-data "$_container_id" php "$_docker_occ" user:setting "$_user" files quota "$_quota"
 
 
 ## Ajout de l'utilisateur dans Nextcloud (Bare metal)
