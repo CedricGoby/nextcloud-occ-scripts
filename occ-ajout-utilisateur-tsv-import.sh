@@ -68,7 +68,6 @@ docker exec -it --user www-data "$_container_id" php "$_docker_occ" user:setting
 #docker-compose -f "$_docker_compose_file" exec -T --user www-data "$_compose_service_name" php "$_docker_occ" user:setting "$_user" settings email "$_email"
 #docker-compose -f "$_docker_compose_file" exec -T --user www-data "$_compose_service_name" php "$_docker_occ" user:setting "$_user" core lang fr
 #docker-compose -f "$_docker_compose_file" exec -T --user www-data "$_compose_service_name" php "$_docker_occ" user:setting "$_user" files quota "$_quota"
-##fi
 
 # Envoi des identifiants à l'utilisateur par email avec msmtp
 msmtp -d -a default -t <<END
