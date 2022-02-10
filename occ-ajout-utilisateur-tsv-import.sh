@@ -63,7 +63,7 @@ docker exec -it --user www-data "$_container_id" php "$_docker_occ" user:setting
 
 
 ## Ajout de l'utilisateur dans Nextcloud (Docker compose)
-#docker exec -T -e OC_PASS="$OC_PASS" --user www-data "$_compose_service_name" php "$_docker_occ" user:add --password-from-env --display-name="$_name" --group="$_group" $_user
+#docker-compose -f "$_docker_compose_file" exec -T -e OC_PASS="$OC_PASS" --user www-data "$_compose_service_name" php "$_docker_occ" user:add --password-from-env --display-name="$_name" --group="$_group" $_user
 ## Paramétrage du compte utilisateur dans Nextcloud
 #docker-compose -f "$_docker_compose_file" exec -T --user www-data "$_compose_service_name" php "$_docker_occ" user:setting "$_user" settings email "$_email"
 #docker-compose -f "$_docker_compose_file" exec -T --user www-data "$_compose_service_name" php "$_docker_occ" user:setting "$_user" core lang fr
