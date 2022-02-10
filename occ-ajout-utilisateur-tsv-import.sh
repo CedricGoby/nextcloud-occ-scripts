@@ -29,7 +29,7 @@ _container_id=""
 _docker_occ="/var/www/html/occ"
 
 # Définition du quota
-export _quota="100MB"
+export _quota="1MB"
 # Définition du groupe
 export _group=""
 
