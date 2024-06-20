@@ -2,7 +2,7 @@
 
 # Description : Importation d'utilisateurs dans Nextcloud depuis un fichier TSV avec la commande occ,
 # envoi par email des identifiants à l'utilisateur.
-# Usage : ./occ-ajout-utilisateur-csv-import.sh
+# Usage : ./install_uninstall_enable_apps.sh
 # Licence : MIT
 # Auteur : Cédric Goby
 # Versioning : https://gitlab.com/CedricGoby/nextcloud-occ-scripts
