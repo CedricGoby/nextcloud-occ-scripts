@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-# Description : Importation d'utilisateurs dans Nextcloud depuis un fichier TSV avec la commande occ, 
-# envoi par email des identifiants à l'utilisateur. 
+# Description : Importation d'utilisateurs dans Nextcloud depuis un fichier TSV avec la commande occ,
+# envoi par email des identifiants à l'utilisateur.
 # Usage : ./occ-ajout-utilisateur-csv-import.sh
 # Licence : MIT
 # Auteur : Cédric Goby
@@ -25,18 +25,21 @@ _compose_service_name=""
 # Container ID Nextcloud (Docker)
 _container_id=""
 
+# Container _name
+_container_name="nextcloud-app"
+
 # Chemin OCC (Docker compose)
 _docker_occ="/var/www/html/occ"
 
 # Définition du quota
-export _quota="1MB"
+export _quota="2GB"
 # Définition du groupe
-export _group=""
+#export _group=""
 
 # On parcourt le fichier TSV des utilisateurs à importer dans Nextcloud
 # -u bash 4.1 ou plus récent peut allouer un descripteur de fichier libre
 # Sinon la commande docker-compose exec peut consumer stdin (la liste des lignes restantes).
-while IFS=$'\t' read -u "$fd_num" _user _name _email; do
+while IFS=$'\t' read -u "$fd_num" _user _name _email _group; do
 
 # Génération d'un mot de passe utlisateur
 export OC_PASS="$(gpg --armor --gen-random 1 8)"
@@ -44,14 +47,15 @@ export OC_PASS="$(gpg --armor --gen-random 1 8)"
 export _user="$_user"
 export _name="$_name"
 export _email="$_email"
+export _group="$_group"
 
 
 # Ajout de l'utilisateur dans Nextcloud (Docker)
-docker exec -it -e OC_PASS="$OC_PASS" --user www-data "$_container_id" php "$_docker_occ" user:add --password-from-env --display-name="$_name" --group="$_group" $_user
+docker exec -it -e OC_PASS="$OC_PASS" --user www-data "$_container_name" php "$_docker_occ" user:add --password-from-env --display-name="$_name" --group="$_group" $_user
 # Paramétrage du compte utilisateur dans Nextcloud
-docker exec -it --user www-data "$_container_id" php "$_docker_occ" user:setting "$_user" settings email "$_email"
-docker exec -it --user www-data "$_container_id" php "$_docker_occ" user:setting "$_user" core lang fr
-docker exec -it --user www-data "$_container_id" php "$_docker_occ" user:setting "$_user" files quota "$_quota"
+docker exec -it --user www-data "$_container_name" php "$_docker_occ" user:setting "$_user" settings email "$_email"
+docker exec -it --user www-data "$_container_name" php "$_docker_occ" user:setting "$_user" core lang fr
+docker exec -it --user www-data "$_container_name" php "$_docker_occ" user:setting "$_user" files quota "$_quota"
 
 
 ## Ajout de l'utilisateur dans Nextcloud (Bare metal)
@@ -70,32 +74,32 @@ docker exec -it --user www-data "$_container_id" php "$_docker_occ" user:setting
 #docker-compose -f "$_docker_compose_file" exec -T --user www-data "$_compose_service_name" php "$_docker_occ" user:setting "$_user" files quota "$_quota"
 
 # Envoi des identifiants à l'utilisateur par email avec msmtp
-msmtp -d -a default -t <<END
-From: $_from
-To: $_email
-Content-Type: text/plain; charset=UTF-8
-Subject: $_name - Vos identifiants Nextcloud $_url_nextcloud
-
-Bonjour $_name,
-
-Veuillez trouver ci-dessous vos identifiants Nextcloud...
-
-$_url_nextcloud
-Utilisateur : $_user
-Mot de passe : $OC_PASS
-
-...et les bonnes pratiques et logiciels pour gérer vos mots de passe :
-https://www.cybermalveillance.gouv.fr/tous-nos-contenus/bonnes-pratiques/mots-de-passe
-
-Ceci est un email automatique, merci de ne pas répondre à ce message.
-
-Bonne journée
-
-END
+# msmtp -d -a default -t <<END
+# From: $_from
+# To: $_email
+# Content-Type: text/plain; charset=UTF-8
+# Subject: $_name - Vos identifiants Nextcloud $_url_nextcloud
+#
+# Bonjour $_name,
+#
+# Veuillez trouver ci-dessous vos identifiants Nextcloud...
+#
+# $_url_nextcloud
+# Utilisateur : $_user
+# Mot de passe : $OC_PASS
+#
+# ...et les bonnes pratiques et logiciels pour gérer vos mots de passe :
+# https://www.cybermalveillance.gouv.fr/tous-nos-contenus/bonnes-pratiques/mots-de-passe
+#
+# Ceci est un email automatique, merci de ne pas répondre à ce message.
+#
+# Bonne journée
+#
+# END
 
 # Création (si besoin) d'un fichier TSV des utilisateurs importés dans Nextcloud.
 # Attention, le mot de passe est enregistré en clair dans le fichier.
-# printf "%s\t%s\t%s\t%s\t%s\t%s\n" "$_user" "$_name" "$OC_PASS" "$_group" "$_email" "$_quota" >> "$_src_added_users"
+printf "%s\t%s\t%s\t%s\t%s\t%s\n" "$_user" "$_name" "$OC_PASS" "$_group" "$_email" "$_quota" >> "$_src_added_users"
 
 # Destruction des variables utilisateur
 unset OC_PASS
