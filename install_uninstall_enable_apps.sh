@@ -23,7 +23,7 @@ disable_apps() {
     echo "Désactivation de l'application : $app"
     result=$(docker exec -it --user www-data nextcloud-app php /var/www/html/occ app:disable "$app" 2>&1)
     if [[ $? -eq 0 ]]; then
-      echo "L'application $app a été désactivée avec succès."
+      echo "L'application $app a été désactivée avec succès : $result"
     else
       echo "Erreur lors de la désactivation de l'application $app : $result"
     fi
@@ -37,7 +37,7 @@ enable_apps() {
     echo "Activation de l'application : $app"
     result=$(docker exec -it --user www-data nextcloud-app php /var/www/html/occ app:enable "$app" 2>&1)
     if [[ $? -eq 0 ]]; then
-      echo "L'application $app a été activée avec succès."
+      echo "L'application $app a été activée avec succès : $result"
     else
       echo "Erreur lors de l'activation de l'application $app : $result"
     fi
@@ -51,7 +51,7 @@ install_apps() {
     echo "Installation de l'application : $app"
     result=$(docker exec -it --user www-data nextcloud-app php /var/www/html/occ app:install "$app" 2>&1)
     if [[ $? -eq 0 ]]; then
-      echo "L'application $app a été installée avec succès."
+      echo "L'application $app a été installée avec succès : $result"
     else
       echo "Erreur lors de l'installation de l'application $app : $result"
     fi
