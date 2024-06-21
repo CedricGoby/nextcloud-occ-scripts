@@ -7,12 +7,12 @@
 # Auteur : Cédric Goby
 # Versioning : https://gitlab.com/CedricGoby/nextcloud-occ-scripts
 
-# REMOVE apps
-docker exec -it --user www-data nextcloud-app php /var/www/html/occ app:remove firstrunwizard
-docker exec -it --user www-data nextcloud-app php /var/www/html/occ app:remove dashboard
-docker exec -it --user www-data nextcloud-app php /var/www/html/occ app:remove weather_status
-docker exec -it --user www-data nextcloud-app php /var/www/html/occ app:remove survey_client
-docker exec -it --user www-data nextcloud-app php /var/www/html/occ app:remove recommendations
+# DISABLE shipped apps
+docker exec -it --user www-data nextcloud-app php /var/www/html/occ app:disable firstrunwizard
+docker exec -it --user www-data nextcloud-app php /var/www/html/occ app:disable dashboard
+docker exec -it --user www-data nextcloud-app php /var/www/html/occ app:disable weather_status
+docker exec -it --user www-data nextcloud-app php /var/www/html/occ app:disable survey_client
+docker exec -it --user www-data nextcloud-app php /var/www/html/occ app:disable recommendations
 
 # ENABLE apps
 docker exec -it --user www-data nextcloud-app php /var/www/html/occ app:enable files_external
