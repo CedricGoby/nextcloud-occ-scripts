@@ -9,7 +9,7 @@
 
 # Fichier TSV d'entrée (utilisateurs à importer) séparé par des tabulations contenant les champs suivants : nom d'utilisateur, nom à afficher, adresse email.
 # Le fichier TSV ne doit comporter ni en-têtes ni lignes vides.
-_src_users_to_add="add_users_list.tsv"
+_src_users_to_add="add_users.tsv"
 # Expéditeur du mail contenant les identifiants utilisateur
 _from=""
 # URL Nextcloud
