@@ -12,41 +12,42 @@
 _src_users_to_add="add_users.tsv"
 # URL Nextcloud
 _url_nextcloud=""
-# Chemin OCC (Docker compose)
-_docker_occ="/var/www/html/occ"
-
 # Définition du quota
-export _quota="2GB"
+_quota="10GB"
 # Définition du groupe
 #export _group=""
-
+# Nom du conteneur Nextcloud
+_container_name="nextcloud-app"
 # On parcourt le fichier TSV des utilisateurs à importer dans Nextcloud
-# -u bash 4.1 ou plus récent peut allouer un descripteur de fichier libre
-# Sinon la commande docker-compose exec peut consumer stdin (la liste des lignes restantes).
 while IFS=$'\t' read -u "$fd_num" _user _name _email _group; do
 
-# Génération d'un mot de passe utlisateur
-export OC_PASS="$(gpg --armor --gen-random 1 8)"
-# Export des variables utilisateur
-export _user="$_user"
-export _name="$_name"
-export _email="$_email"
-export _group="$_group"
 
-# Ajout de l'utilisateur dans Nextcloud (Docker)
-docker exec -it -e OC_PASS="$OC_PASS" --user www-data "$_container_name" php "$_docker_occ" user:add --password-from-env --display-name="$_name" --group="$_group" $_user
-# Paramétrage du compte utilisateur dans Nextcloud
-docker exec -it --user www-data "$_container_name" php "$_docker_occ" user:setting "$_user" settings email "$_email"
-docker exec -it --user www-data "$_container_name" php "$_docker_occ" user:setting "$_user" core lang fr
-docker exec -it --user www-data "$_container_name" php "$_docker_occ" user:setting "$_user" files quota "$_quota"
+# Le script est executé sur l'hôte docker
+if grep -q systemd <<< $(cat /proc/1/sched | head -n 1); then
 
-# Destruction des variables utilisateur
-unset OC_PASS
-unset _user
-unset _name
-unset _email
+    # Génération d'un mot de passe utlisateur
+    export OC_PASS="$(gpg --armor --gen-random 1 8)"
 
-# bash 4.1 ou plus récent peut allouer un descripteur de fichier libre {fd_num}
+    # Ajout de l'utilisateur dans Nextcloud
+    docker exec -it -e OC_PASS="$OC_PASS" --user www-data "$_container_name" php /var/www/html/occ user:add --password-from-env --display-name="$_name" --group="$_group" $_user
+    # Paramétrage du compte utilisateur dans Nextcloud
+    docker exec -it --user www-data "$_container_name" php /var/www/html/occ user:setting "$_user" settings email "$_email"
+    docker exec -it --user www-data "$_container_name" php /var/www/html/occ user:setting "$_user" core lang fr
+    docker exec -it --user www-data "$_container_name" php /var/www/html/occ user:setting "$_user" files quota "$_quota"
+
+# Le script est executé dans le conteneur
+else
+    # Génération d'un mot de passe utlisateur
+    _password="$(gpg --armor --gen-random 1 8)"
+
+    # Ajout de l'utilisateur dans Nextcloud
+    php /var/www/html/occ user:add "$_password" --display-name="$_name" --group="$_group" $_user
+    # Paramétrage du compte utilisateur dans Nextcloud
+    php /var/www/html/occ user:setting "$_user" settings email "$_email"
+    php /var/www/html/occ user:setting "$_user" core lang fr
+    php /var/www/html/occ user:setting "$_user" files quota "$_quota"
+fi
+
 done {fd_num}<"$_src_users_to_add"
 
 
