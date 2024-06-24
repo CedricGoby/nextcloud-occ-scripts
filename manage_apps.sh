@@ -2,7 +2,7 @@
 
 # Description : Installation, désinstallation, activation, désactivation d'applications Nextcloud
 # https://apps.nextcloud.com/
-# Usage : ./install_uninstall_enable_apps.sh
+# Usage : ./manage_apps.sh
 # Licence : MIT
 # Auteur : Cédric Goby
 # Versioning : https://gitlab.com/CedricGoby/nextcloud-occ-scripts
