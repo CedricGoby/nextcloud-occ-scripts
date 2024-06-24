@@ -10,21 +10,8 @@
 # Fichier TSV d'entrée (utilisateurs à importer) séparé par des tabulations contenant les champs suivants : nom d'utilisateur, nom à afficher, adresse email.
 # Le fichier TSV ne doit comporter ni en-têtes ni lignes vides.
 _src_users_to_add="add_users.tsv"
-# Expéditeur du mail contenant les identifiants utilisateur
-_from=""
 # URL Nextcloud
 _url_nextcloud=""
-# Fichier compose
-_docker_compose_file=""
-# Service name Nextcloud (Docker compose)
-_compose_service_name=""
-
-# Container ID Nextcloud (Docker)
-_container_id=""
-
-# Container _name
-_container_name="nextcloud-app"
-
 # Chemin OCC (Docker compose)
 _docker_occ="/var/www/html/occ"
 
@@ -53,30 +40,6 @@ docker exec -it --user www-data "$_container_name" php "$_docker_occ" user:setti
 docker exec -it --user www-data "$_container_name" php "$_docker_occ" user:setting "$_user" core lang fr
 docker exec -it --user www-data "$_container_name" php "$_docker_occ" user:setting "$_user" files quota "$_quota"
 
-# Envoi des identifiants à l'utilisateur par email avec msmtp
-# msmtp -d -a default -t <<END
-# From: $_from
-# To: $_email
-# Content-Type: text/plain; charset=UTF-8
-# Subject: $_name - Vos identifiants Nextcloud $_url_nextcloud
-#
-# Bonjour $_name,
-#
-# Veuillez trouver ci-dessous vos identifiants Nextcloud...
-#
-# $_url_nextcloud
-# Utilisateur : $_user
-# Mot de passe : $OC_PASS
-#
-# ...et les bonnes pratiques et logiciels pour gérer vos mots de passe :
-# https://www.cybermalveillance.gouv.fr/tous-nos-contenus/bonnes-pratiques/mots-de-passe
-#
-# Ceci est un email automatique, merci de ne pas répondre à ce message.
-#
-# Bonne journée
-#
-# END
-
 # Destruction des variables utilisateur
 unset OC_PASS
 unset _user
@@ -85,3 +48,5 @@ unset _email
 
 # bash 4.1 ou plus récent peut allouer un descripteur de fichier libre {fd_num}
 done {fd_num}<"$_src_users_to_add"
+
+
